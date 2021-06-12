@@ -1,0 +1,47 @@
+{% extends 'starter.html' %}
+
+{% block title %}
+        <h1>
+            客户信息展示
+            <small>Optional description</small>
+          </h1>
+{% endblock %}
+
+{% block content %}
+<!--信息表-->
+<div class="container-fluid">
+    <a href="{% url 'addcustomer' %}" class="btn btn-primary">添加客户信息</a>
+    <table class="table table-hover table-striped table-bordered">
+        <thead>
+        <tr>
+            <th>序号</th>
+            <th>QQ号</th>
+            <th>姓名</th>
+            <th>性别</th>
+            <th>咨询课程</th>
+            <th>状态</th>
+            <th>销售</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for customer in all_customer %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ customer.QQ }}</td>
+                <td>{{ customer.sex }}</td>
+                <td>{{ customer.name }}</td>
+                <td>{{ customer.course }}</td>
+                <td>{{ customer.status }}</td>
+                <td>{{ customer.consultant }}</td>
+                <td>
+                    <a href="{% url 'editcustomer' customer.pk %}"><i class="fa fa-edit fa-2x"></i></a>
+{#                    <a href="#"><i class="fa fa-remove"></i></a>#}
+{#                    <a href="#" class="btn btn-warning btn-sm">编辑</a>  <!--小号按钮-->#}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

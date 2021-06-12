@@ -1,0 +1,87 @@
+{% load static %}
+<!DOCTYPE html>
+<!-- saved from url=(0050)http://www.jq22.com/demo/jquery-Sharelink20151012/ -->
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>24期后宫</title>
+    <link rel="stylesheet" href="{% static 'login/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap-3.3.7-dist/js/bootstrap.min.js' %}">
+</head>
+<body>
+<div class="login-container">
+    <h1>你瞅啥</h1>
+    <div class="connect">
+        <p style="left: 0%;">赶紧进来小老弟</p>
+    </div>
+    <form action="" method="post" id="loginForm"
+          novalidate="novalidate">
+
+        <span class="login_errors" style="color:red;"></span>
+
+        <div>
+            <input type="text" name="username" class="username" placeholder="用户名" autocomplete="off">   <!-- 有提示 -->
+        </div>
+        <div>
+            <input type="password" name="password" class="password" placeholder="密码" oncontextmenu="return false"
+                   onpaste="return false">  <!-- 禁止粘贴 -->
+
+        </div>
+
+
+        <button id="submit" type="button">登 陆</button>
+    </form>
+     <a href="{% url 'register' %}">
+        <button type="button" class="register-tis">办个会员吧？</button>
+    </a>
+
+</div>
+
+<script src="{% static 'login/js/jquery.min.js' %}"></script>
+
+<script src="{% static 'login/js/common.js' %}"></script>
+
+<script src="{% static 'login/js/supersized.3.2.7.min.js' %}"></script>
+<script src="{% static 'login/js/supersized-init.js' %}"></script>
+
+<script src="{% static 'login/js/jquery.validate.min.js' %}"></script>
+
+<script>
+
+
+
+ </script>
+<script>
+    //loginReq（）方法为请求登录检索的方法
+    $("#submit").click(function (){
+        loginReq();
+    })
+     $(document).keydown(function(){
+        if (event.keyCode === 13) {//回车键的键值为13
+            loginReq();
+        　}
+    });
+
+    function loginReq() {//登录请求的方法
+        var account = $('.username').val();
+        var pwd = $('.password').val()
+        $.ajax({
+            url:'{% url "login" %}',
+            type:'post',
+            data:{username:account,pwd:pwd,csrfmiddlewaretoken:'{{ csrf_token }}'},
+            success:function (res) {    //{'status':1,'home':'/home/','msg':'用户名或密码错误'}
+                if (res.status === 1){
+                    location.href=res.home
+                }
+                else {
+                    {#location.reload();#}
+                    $('.login_errors').text(res.msg)
+                }
+            }
+        })
+    }
+</script>
+
+</body>
+</html>
