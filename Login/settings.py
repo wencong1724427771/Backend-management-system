@@ -128,3 +128,8 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+#分页封装
+PER_PAGE_NUM=10
+PAGE_NUMBER_SHOW=7 #页码数，不能为偶数
