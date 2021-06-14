@@ -5,6 +5,7 @@ from django.http import JsonResponse
 from utils.md5_func import md5_function
 from django.urls import reverse
 from sales import myforms
+from django.utils.safestring import mark_safe  #{{ page_html|safe }}
 # Create your views here.
 
 
@@ -112,63 +113,121 @@ def register(request):
             )
             return redirect('login')
         else:
-            print(333)
             return render(request, 'login/register.html', {'register_obj':register_obj})
 
 
 def home(request):
     return render(request,'customer/home.html')
 
+
 def customers(request):
-    all_customer=models.Customer.objects.all()
-    return render(request,'customer/customers.html',{'all_customer':all_customer})
+    current_page_number = request.GET.get('page')  #当前页码
+    try:    # 防止恶意输入错误代码
+        current_page_number = abs(int(current_page_number))
+    except Exception:
+        current_page_number = 1
 
+    per_page_num = 10  # 每页显示多少数据
+    page_number_show = 7  # 总共显示的页码数量
+    half_number = page_number_show // 2
 
-
-def addcustomer(request):
-    if request.method == 'GET':
-        book_form_obj = myforms.CustomerModelForm()
-        return render(request,'customer/addcustomer.html',{'book_form_obj':book_form_obj})
+    all_customer = models.Customer.objects.all()[0:200]   # 当前数据库中所有客户数据
+    total_count = all_customer.count()  # 客户数据总数
+    a, b = divmod(total_count, per_page_num)  # 商和余数
+    if b:  # 如果余数不为0，页码总数为商加一
+        total_page_count = a + 1
     else:
-        book_form_obj = myforms.CustomerModelForm(request.POST)
+        total_page_count = a
 
-        if book_form_obj.is_valid():
-            book_form_obj.save()
-            return redirect('customers')
+
+    #如果当前页码小于等于0时，默认显示第一页
+    if current_page_number<=0:
+        current_page_number = 1
+
+    if current_page_number >= total_page_count:
+        current_page_number = total_page_count
+
+
+    star_page_number = current_page_number -half_number
+    end_page_number = current_page_number + half_number + 1 # range故首不顾尾
+
+
+    if star_page_number<1:
+        star_page_number = 1
+        end_page_number = page_number_show + 1
+
+    if end_page_number >= total_page_count:
+        star_page_number = total_page_count - page_number_show+1
+        end_page_number = total_page_count+1
+
+    # 如果总页数小于需要展示的页数
+    if total_page_count < page_number_show:
+        star_page_number = 1
+        end_page_number = total_page_count+1
+
+    page_number_range = range(star_page_number,end_page_number)  #<class 'range'>
+
+    all_customer=all_customer[(current_page_number-1)*per_page_num:current_page_number*per_page_num] #[0:10]、[10:20]
+
+   # 页面数据
+    page_html = ''
+    for i in page_number_range:  # range(0:10)
+        if i==current_page_number:   # 为当前页添加颜色
+
+            page_html += f'<li class="active"><a href = "?page={i}" > {i} </a></li>'
         else:
-            return render(request, 'customer/addcustomer.html', {'book_form_obj': book_form_obj})
+            page_html += f'<li><a href = "?page={i}" > {i} </a></li>'
+    #前一页
+    previous_page = f'''
+            <li>
+               <a href="?page={current_page_number - 1}" aria-label="Previous">
+                 <span aria-hidden="true">&laquo;</span>
+               </a>
+            </li>
+        '''
+    #后一页
+    next_page = f'''
+            <li>
+                <a href="?page={current_page_number + 1}" aria-label="Next">
+                 <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        '''
+    first_page = f'''
+        <li>
+           <a href="?page={1}" aria-label="Previous">
+             <span aria-hidden="true">首页</span>
+           </a>
+        </li>
+    '''
+    last_page = f'''
+        <li>
+           <a href="?page={total_page_count}" aria-label="Previous">
+             <span aria-hidden="true">尾页</span>
+           </a>
+        </li>
+    '''
+
+    page_html = f'''
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            {first_page}
+            {previous_page}
+            {page_html}
+            {next_page}
+            {last_page}
+        </ul>
+    </nav>
+    '''
 
 
-# 编辑用户
-def editcustomer(request,n): # n 编辑的是那条用用户
-    old_obj = models.Customer.objects.filter(pk=n).first()
-    if request.method == 'GET':
-        book_form_obj = myforms.CustomerModelForm(instance=old_obj)  # 关键字instance
-        return render(request, 'customer/editcustomer.html', {'book_form_obj': book_form_obj})
-    else:
-        book_form_obj = myforms.CustomerModelForm(request.POST,instance=old_obj)  # instance=old_obj
-        if book_form_obj.is_valid():
-            book_form_obj.save()
-            return redirect('/customers/')
-        else:
-            return render(request, 'customer/editcustomer.html', {'book_form_obj': book_form_obj})
+    return render(request,'customer/customers.html',
+        {'all_customer':all_customer,'page_html':mark_safe(page_html)})
 
-'''
-# def edit_book(request, pk):
-#     book_obj = models.Book.objects.filter(id=pk).first()
-#     if request.method == "POST":
-#         #修改数据时，直接可以将用户数据包request.POST传进去，
-#         #再传一个要修改的对象的示例，ModelForm就可以自动完成修改数据了。
-#         form_obj = forms.BookModelForm(request.POST, instance=book_obj)
-#         if form_obj.is_valid():  // 数据校验
-#             form_obj.save()   // 直接保存
-#         return redirect("/book_list/")
-#     #form_obj通过instance设置初始化的值，例如，图书管理系统中的编辑书籍功能，
-#     #点击编辑后跳转到编辑书籍页面，跳转后需要用要编辑的书籍信息填充页面对应信息。
-#     #不同于Form组件的是，ModelForm直接就可以传实例化的对象，而不需要将对象转化成字典的形式传。
-#     form_obj = forms.BookModelForm(instance=book_obj)  
-#     return render(request, "v2/edit_book.html", locals())
-'''
+
+
+
+
 #合并添加删除页面
 def addEditCustomer(request,n=None): # n 编辑的是那条用用户
     old_obj = models.Customer.objects.filter(pk=n).first()
