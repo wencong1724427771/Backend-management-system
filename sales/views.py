@@ -124,13 +124,43 @@ def home(request):
 
 def customers(request):
     current_page_number = request.GET.get('page')  #当前页码
-    all_customer = models.Customer.objects.all()[0:200]  # 当前数据库中所有客户数据
+
+    search_field = request.GET.get('search_field')   #搜索条件
+    keyword = request.GET.get('keyword')  #搜索数据
+
+    # http: // 127.0.0.1: 8000 / customers /?search_field = qq & keyword = 123  #
+    # print(request.GET)  # <QueryDict: {'search_field': ['qq'], 'keyword': ['172']}>
+    # print(request.GET.urlencode())  # page=2&search_field=qq&keyword=123
+    import copy
+    recv_data = copy.copy(request.GET)  # 处理 This QueryDict instance is immutable错误
+    print(type(recv_data))  #
+    # from django.http.request import QueryDict
+
+
+    from django.db.models import Q
+
+    # models.Customer.objects.filter(Q(name__contains='陈')|Q(qq_contains='11'))
+    if keyword:
+        # models.Customer.objects.filter(**{search_field+'__contains':keyword}   #name='陈')
+
+        q = Q()  # 实例化对象
+        # q.connector = 'or'   # 默认是and
+        q.children.append([search_field+'__contains',keyword])   #Q('name__contains'='陈')
+        # q.children.append(['name','xx'])      #filter(qq='11',name='xx')
+        all_customer = models.Customer.objects.filter(q)
+
+    else:
+        all_customer = models.Customer.objects.all()
+
+
+
+
     total_count = all_customer.count()  # 客户数据总数
 
     per_page_num = settings.PER_PAGE_NUM
     page_number_show = settings.PAGE_NUMBER_SHOW
 
-    page_obj = Paging(current_page_number,total_count,per_page_num,page_number_show)
+    page_obj = Paging(current_page_number,total_count,per_page_num,page_number_show,recv_data)
     all_customer=all_customer[page_obj.start_data_number:page_obj.end_data_number]
     page_html = page_obj.page_html_func
 
