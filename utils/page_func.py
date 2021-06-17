@@ -7,7 +7,7 @@ class Paging:
 
         :param current_page_number: 当前页码
         :param total_count:         总数据量
-        :param per_page_num_page:    每页显示多少条数据
+        :param per_page_num:    每页显示多少条数据
         :param page_number_show:    总共显示多少个页码
         :total_page_count:          总的页码数
         :param star_page_number:    起始页码
@@ -31,12 +31,15 @@ class Paging:
         else:
             total_page_count = a
 
+        # 如果当前页码大于等于总页数，默认显示最后一页----并处理没有数据时total——page_count=0的情况
+        if current_page_number >= total_page_count:
+            current_page_number = total_page_count
+
         # 如果当前页码小于等于0时，默认显示第一页
         if current_page_number <= 0:
             current_page_number = 1
 
-        if current_page_number >= total_page_count:
-            current_page_number = total_page_count
+
 
         star_page_number = current_page_number - half_number   # 起始页码
         end_page_number = current_page_number + half_number + 1  # range故首不顾尾

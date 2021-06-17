@@ -1,88 +1,89 @@
 {% extends 'starter.html' %}
 
 {% block title %}
-        <h1>
-            客户信息展示
-            <small>Optional description</small>
-          </h1>
+    <h1>
+        客户信息展示
+        <small>Optional description</small>
+    </h1>
 {% endblock %}
 
 {% block content %}
-<!--信息表-->
-<div class="container-fluid">
-    <a href="{% url 'addcustomer' %}" class="btn btn-primary">添加客户信息</a>
+    <!--信息表-->
+    <div class="container-fluid">
+        <a href="{% url 'addcustomer' %}" class="btn btn-primary">添加客户信息</a>
 
-    <form class="form-inline pull-right" action="#" method="get">
-{#        {% csrf_token %}#}
-         <div class="form-group">
-             <select name="search_field" id="" class="form-control">
-                 <option value="qq">qq</option>
-                 <option value="name">姓名</option>
-             </select>
-         </div>
-          <div class="form-group">
-            <input type="text" class="form-control" id="search_word" placeholder="请输入" name="keyword">
-          </div>
-          <button type="submit" class="btn btn-success">搜索</button>
-</form>
+        <!-- 搜索功能 -->
+        <form class="form-inline pull-right" action="#" method="get">
+            <div class="form-group">
+                <select name="search_field" id="search_field" class="form-control">
+{#                    <option value="all" selected >全部</option>#}
+                    <option value="qq">qq</option>
+                    <option value="name">姓名</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control" id="search_word" placeholder="请输入" name="keyword" value="{{ keyword|default:'' }}">
+            </div>
+            <button type="submit" class="btn btn-success">搜索</button>
+        </form>
+        <hr>
 
-    <table class="table table-hover table-striped table-bordered">
-        <thead>
-        <tr>
-            <th>序号</th>
-            <th>QQ号</th>
-            <th>姓名</th>
-            <th>性别</th>
-            <th>咨询课程</th>
-            <th>状态</th>
-            <th>销售</th>
-            <th>操作</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for customer in all_customer %}
+
+        <form class="form-inline " action="#" method="get">
+            <div class="form-group">
+                <select name="gzs" id="" class="form-control">
+                    <option value="com_own">公户转私户</option>
+                </select>
+                <button type="submit" class="btn btn-warning">go</button>
+            </div>
+            <table class="table table-hover table-striped table-bordered">
+            <thead>
             <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ customer.qq }}</td>
-                <td>{{ customer.sex }}</td>
-                <td>{{ customer.name }}</td>
-                <td>{{ customer.course }}</td>
-                <td>{{ customer.status }}</td>
-                <td>{{ customer.consultant }}</td>
-                <td>
-                    <a href="{% url 'editcustomer' customer.pk %}"><i class="fa fa-edit fa-2x"></i></a>
-{#                    <a href="#"><i class="fa fa-remove"></i></a>#}
-{#                    <a href="#" class="btn btn-warning btn-sm">编辑</a>  <!--小号按钮-->#}
-                </td>
+
+                <th>序号</th>
+                <th>QQ号</th>
+                <th>姓名</th>
+                <th>性别</th>
+                <th>咨询课程</th>
+                <th>状态</th>
+                <th>销售</th>
+                <th>操作</th>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            {% for customer in all_customer %}
+                <tr>
 
-{#<nav aria-label="Page navigation">#}
-{#  <ul class="pagination">#}
-{#    <li>#}
-{#      <a href="#" aria-label="Previous">#}
-{#        <span aria-hidden="true">&laquo;</span>#}
-{#      </a>#}
-{#    </li>#}
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ customer.qq }}</td>
+                    <td>{{ customer.name }}</td>
+                    <td>{{ customer.sex }}</td>
+                    <td>{{ customer.course }}</td>
+                    <td>{{ customer.status }}</td>
+                    <td>{{ customer.consultant }}</td>
+                    <td>
+                        <a href="{% url 'editcustomer' customer.pk %}"><i class="fa fa-edit fa-2x"></i></a>
 
-{#    <li><a href="/?page=1">1</a></li> <!-- http://127.0.0.1:8000/?page=1# -->#}
-{#    <li><a href="?page=1">1</a></li> <!-- http://127.0.0.1:8000/customers/?page=1# -->#}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        </form>
+    
+        {{ page_html }}
+    
+    </div>
+{% endblock %}
 
-{#       {% for page_number in page_number_range %}   <!-- page_num=range(1,255) -->#}
-{#        <li><a href="?page={{ page_number }}">{{ page_number }}</a></li>#}
-{#      {% endfor %}#}
+{% block js %}
+    <script>
 
-  {{ page_html }}
+        {#$('#search_field option:first').prop("selected",'selected')#}
 
-{#    <li>#}
-{#      <a href="#" aria-label="Next">#}
-{#        <span aria-hidden="true">&raquo;</span>#}
-{#      </a>#}
-{#    </li>#}
-{#  </ul>#}
-{#</nav>#}
 
-</div>
+        var a = '{{ search_field }}';    // search_field=liye
+        console.log(a);
+        $('#search_field').val(a);
+    </script>
 {% endblock %}

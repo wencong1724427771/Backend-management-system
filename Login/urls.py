@@ -30,4 +30,7 @@ urlpatterns = [
     # 编辑客户
     re_path('^editcustomer/(\d+)/$', views.addEditCustomer,name='editcustomer'), #--添加删除使用同一个html页面
 
+    # 我的客服信息
+    # re_path('^mycustomers/$', views.mycustomers,name='mycustomers'),
+
 ]

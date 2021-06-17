@@ -5,7 +5,7 @@ class CustomerModelForm(forms.ModelForm):
     class Meta:
         model = models.Customer
         fields = '__all__'
-        
+
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
 

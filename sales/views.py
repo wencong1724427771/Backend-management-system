@@ -4,9 +4,10 @@ from sales import models
 from django.http import JsonResponse
 from utils.md5_func import md5_function
 from django.urls import reverse
-from sales import myforms
+from sales import myforms   # 添加实现编辑页面
 from utils.page_func import Paging
 from django.conf import settings
+from django.db.models import Q
 # Create your views here.
 
 
@@ -128,16 +129,14 @@ def customers(request):
     search_field = request.GET.get('search_field')   #搜索条件
     keyword = request.GET.get('keyword')  #搜索数据
 
-    # http: // 127.0.0.1: 8000 / customers /?search_field = qq & keyword = 123  #
-    # print(request.GET)  # <QueryDict: {'search_field': ['qq'], 'keyword': ['172']}>
-    # print(request.GET.urlencode())  # page=2&search_field=qq&keyword=123
+    print(search_field, keyword)
+
     import copy
     recv_data = copy.copy(request.GET)  # 处理 This QueryDict instance is immutable错误
     print(type(recv_data))  #
     # from django.http.request import QueryDict
 
 
-    from django.db.models import Q
 
     # models.Customer.objects.filter(Q(name__contains='陈')|Q(qq_contains='11'))
     if keyword:
@@ -155,17 +154,20 @@ def customers(request):
 
 
 
+
     total_count = all_customer.count()  # 客户数据总数
 
     per_page_num = settings.PER_PAGE_NUM
     page_number_show = settings.PAGE_NUMBER_SHOW
 
     page_obj = Paging(current_page_number,total_count,per_page_num,page_number_show,recv_data)
+    # all_customer=all_customer[page_obj.start_data_number:page_obj.end_data_number]
     all_customer=all_customer[page_obj.start_data_number:page_obj.end_data_number]
     page_html = page_obj.page_html_func
 
     return render(request,'customer/customers.html',
-        {'all_customer':all_customer,'page_html':page_html})
+        {'all_customer':all_customer,'page_html':page_html,'keyword':keyword,'search_field':search_field})
+
 
 
 
