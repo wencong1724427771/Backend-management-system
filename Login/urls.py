@@ -20,17 +20,19 @@ from sales import views
 urlpatterns = [
     re_path('admin/', admin.site.urls),
     re_path('^login/', views.login,name='login'),
+    re_path('^logout/', views.logout,name='logout'),
     re_path('^register/', views.register,name='register'),
     re_path('^home/$', views.home,name='home'),
 
-    # 客服信息展示
+    # 公户信息展示
     re_path('^customers/$', views.customers,name='customers'),
+    # 私户信息展示
+    re_path('^mycustomers/$', views.customers,name='mycustomers'),
     # 添加客户
     re_path('^addcustomer/$', views.addEditCustomer,name='addcustomer'),
     # 编辑客户
     re_path('^editcustomer/(\d+)/$', views.addEditCustomer,name='editcustomer'), #--添加删除使用同一个html页面
 
-    # 我的客服信息
-    # re_path('^mycustomers/$', views.mycustomers,name='mycustomers'),
+
 
 ]

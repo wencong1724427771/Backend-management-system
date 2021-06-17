@@ -86,7 +86,10 @@ class Paging:
                 page_html += f"<li><a href = '?{self.recv_data.urlencode() }' > {i} </a></li>"
 
         # 前一页
-        self.recv_data['page'] = self.current_page_number-1
+        if self.current_page_number > 1:
+            self.recv_data['page'] = self.current_page_number-1
+        else:
+            self.recv_data['page'] = self.current_page_number
         previous_page = f'''
                     <li>
                        <a href="?{self.recv_data.urlencode()}" aria-label="Previous">
@@ -95,7 +98,10 @@ class Paging:
                     </li>
                 '''
         # 后一页
-        self.recv_data['page'] = self.current_page_number+1
+        if self.current_page_number < self.total_page_count:
+            self.recv_data['page'] = self.current_page_number+1
+        else:
+            self.recv_data['page'] = self.current_page_number
         next_page = f'''
                     <li>
                         <a href="?{self.recv_data.urlencode()}" aria-label="Next">

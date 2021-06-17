@@ -2,7 +2,11 @@
 
 {% block title %}
     <h1>
-        客户信息展示
+        {% if tag == 1 %}
+            公户信息展示
+        {% elif tag == 0 %}
+            我的客户信息
+        {% endif %}
         <small>Optional description</small>
     </h1>
 {% endblock %}
@@ -16,7 +20,6 @@
         <form class="form-inline pull-right" action="#" method="get">
             <div class="form-group">
                 <select name="search_field" id="search_field" class="form-control">
-{#                    <option value="all" selected >全部</option>#}
                     <option value="qq">qq</option>
                     <option value="name">姓名</option>
                 </select>
@@ -31,8 +34,12 @@
 
         <form class="form-inline " action="#" method="get">
             <div class="form-group">
-                <select name="gzs" id="" class="form-control">
-                    <option value="com_own">公户转私户</option>
+                <select name="" id="" class="form-control">
+                    <!-- 使用自定义标签 -->
+                    {% load mytag %}
+                    {% show_info request %}   <!-- 传入参数request -->
+
+
                 </select>
                 <button type="submit" class="btn btn-warning">go</button>
             </div>
@@ -40,7 +47,7 @@
             <thead>
             <tr>
 
-                <th>序号</th>
+                <th><input type="checkbox" name="select_cids"></th>
                 <th>QQ号</th>
                 <th>姓名</th>
                 <th>性别</th>
@@ -54,10 +61,12 @@
             {% for customer in all_customer %}
                 <tr>
 
+                    <td><input type="checkbox" name="cid"></td>
                     <td>{{ forloop.counter }}</td>
                     <td>{{ customer.qq }}</td>
                     <td>{{ customer.name }}</td>
-                    <td>{{ customer.sex }}</td>
+{#                    <td>{{ customer.sex }}</td>   male#}
+                    <td>{{ customer.get_sex_display }}</td>    <!-- 女 -->
                     <td>{{ customer.course }}</td>
                     <td>{{ customer.status }}</td>
                     <td>{{ customer.consultant }}</td>
@@ -83,7 +92,9 @@
 
 
         var a = '{{ search_field }}';    // search_field=liye
-        console.log(a);
         $('#search_field').val(a);
+
+
+
     </script>
 {% endblock %}

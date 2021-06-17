@@ -1,3 +1,5 @@
+import copy
+
 from django.shortcuts import render,redirect,HttpResponse
 from django import forms
 from sales import models
@@ -73,6 +75,10 @@ class RegisterForm(forms.Form):
         else:
             self.add_error('r_password','两次密码不一致！')
 
+# 注销登录
+def logout(request):
+    request.session.flush()   # 清除cookie,删除session
+    return redirect('/login/')
 
 def login(request):
     res_dict = {'status':None,'home':None,'msg':None}
@@ -86,6 +92,8 @@ def login(request):
         print(user_objs,password)
         print(reverse('home'))
         if user_objs:
+            # 保存当前用户名
+            request.session['account'] = username
 
             res_dict['status'] = 1
             res_dict['home'] = reverse('home')  # '/home/'
@@ -124,19 +132,18 @@ def home(request):
 
 
 def customers(request):
+    path = request.path
+    # print(path)        # /mycustomers/
+    # print(request.session.get('account'))
     current_page_number = request.GET.get('page')  #当前页码
 
     search_field = request.GET.get('search_field')   #搜索条件
     keyword = request.GET.get('keyword')  #搜索数据
 
-    print(search_field, keyword)
 
-    import copy
     recv_data = copy.copy(request.GET)  # 处理 This QueryDict instance is immutable错误
-    print(type(recv_data))  #
+    # print(type(recv_data))  #
     # from django.http.request import QueryDict
-
-
 
     # models.Customer.objects.filter(Q(name__contains='陈')|Q(qq_contains='11'))
     if keyword:
@@ -151,8 +158,15 @@ def customers(request):
     else:
         all_customer = models.Customer.objects.all()
 
-
-
+    if path == '/customers/':
+        tag = 1
+        # 筛选所有的公户信息
+        all_customer = all_customer.filter(consultant__isnull=True)
+    else:
+        tag = 0
+        # 前登录对象在user_info表里面记录的用户名
+        # all_customer = all_customer.filter(consultant__username=当前登录对象在user_info表里面记录的用户名)
+        all_customer = all_customer.filter(consultant__username=request.session.get('account'))
 
 
     total_count = all_customer.count()  # 客户数据总数
@@ -166,7 +180,7 @@ def customers(request):
     page_html = page_obj.page_html_func
 
     return render(request,'customer/customers.html',
-        {'all_customer':all_customer,'page_html':page_html,'keyword':keyword,'search_field':search_field})
+        {'all_customer':all_customer,'page_html':page_html,'keyword':keyword,'search_field':search_field,'tag':tag})
 
 
 
