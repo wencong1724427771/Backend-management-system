@@ -25,13 +25,15 @@ urlpatterns = [
     re_path('^home/$', views.home,name='home'),
 
     # 公户信息展示
-    re_path('^customers/$', views.customers,name='customers'),
+    # re_path('^customers/$', views.customers,name='customers'),
+    re_path('^customers/$', views.Customers.as_view(),name='customers'),
     # 私户信息展示
-    re_path('^mycustomers/$', views.customers,name='mycustomers'),
+    # re_path('^mycustomers/$', views.customers,name='mycustomers'),
+    re_path('^mycustomers/$', views.Customers.as_view(),name='mycustomers'),
     # 添加客户
     re_path('^addcustomer/$', views.addEditCustomer,name='addcustomer'),
     # 编辑客户
-    re_path('^editcustomer/(\d+)/$', views.addEditCustomer,name='editcustomer'), #--添加删除使用同一个html页面
+    re_path('^editcustomer/(\d+)/', views.addEditCustomer,name='editcustomer'), #--添加删除使用同一个html页面
 
 
 

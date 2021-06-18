@@ -32,13 +32,14 @@
         <hr>
 
 
-        <form class="form-inline " action="#" method="get">
+        <form class="form-inline " action="#" method="post">
+        {% csrf_token %}
             <div class="form-group">
-                <select name="" id="" class="form-control">
+                <select name="action" class="form-control">
                     <!-- 使用自定义标签 -->
                     {% load mytag %}
                     {% show_info request %}   <!-- 传入参数request -->
-
+                    <option value="bulk_delete">批量删除</option>
 
                 </select>
                 <button type="submit" class="btn btn-warning">go</button>
@@ -60,18 +61,19 @@
             <tbody>
             {% for customer in all_customer %}
                 <tr>
-
-                    <td><input type="checkbox" name="cid"></td>
+                    <td><input type="checkbox" name="cids" value="{{ customer.pk }}"></td>
                     <td>{{ forloop.counter }}</td>
                     <td>{{ customer.qq }}</td>
                     <td>{{ customer.name }}</td>
 {#                    <td>{{ customer.sex }}</td>   male#}
-                    <td>{{ customer.get_sex_display }}</td>    <!-- 女 -->
+                    <td>{{ customer.get_sex_display }}</td>  <!--对于配置了choices参数的字段，django提供了get_xxx_display方法 -女-->
                     <td>{{ customer.course }}</td>
                     <td>{{ customer.status }}</td>
                     <td>{{ customer.consultant }}</td>
                     <td>
                         <a href="{% url 'editcustomer' customer.pk %}"><i class="fa fa-edit fa-2x"></i></a>
+{#                        <a href="{% url 'editcustomer' customer.pk %}?next={{ request.get_full_path }}"><i class="fa fa-edit fa-2x"></i></a>#}
+                        <a href="{% reverse_url 'editcustomer' customer.pk request %}"><i class="fa fa-edit fa-2x"></i></a>
 
                     </td>
                 </tr>

@@ -1,3 +1,4 @@
+# 分页搜索
 from django.utils.safestring import mark_safe  #{{ page_html|safe }}
 
 class Paging:
