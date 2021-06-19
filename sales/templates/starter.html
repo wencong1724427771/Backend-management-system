@@ -213,7 +213,7 @@ desired effect
                   <a href="#" class="btn btn-default btn-flat">Profile</a>
                 </div>
                 <div class="pull-right">
-                  <a href="{% url 'logout' %}" class="btn btn-default btn-flat">Sign out</a>
+                  <a href="{% url 'sales:logout' %}" class="btn btn-default btn-flat">Sign out</a>
                 </div>
               </li>
             </ul>
@@ -260,8 +260,9 @@ desired effect
       <ul class="sidebar-menu" data-widget="tree">
         <li class="header">HEADER</li>
         <!-- Optionally, you can add icons to the links -->
-        <li class="active"><a href="{% url 'customers' %}"><i class="fa fa-link"></i> <span>公户信息</span></a></li>
-        <li><a href="{% url 'mycustomers' %}"><i class="fa fa-link"></i> <span>私户信息</span></a></li>
+        <li class="active"><a href="{% url 'sales:customers' %}"><i class="fa fa-link"></i> <span>公户信息</span></a></li>
+        <li><a href="{% url 'sales:mycustomers' %}"><i class="fa fa-link"></i> <span>私户信息</span></a></li>
+        <li><a href=""><i class="fa fa-link"></i> <span>跟进记录</span></a></li>
         <li class="treeview">
           <a href="#"><i class="fa fa-link"></i> <span>Multilevel</span>
             <span class="pull-right-container">

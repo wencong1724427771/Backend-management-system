@@ -32,7 +32,7 @@
 
         <button id="submit" type="button">登 陆</button>
     </form>
-     <a href="{% url 'register' %}">
+     <a href="{% url 'sales:register' %}">
         <button type="button" class="register-tis">办个会员吧？</button>
     </a>
 
@@ -67,7 +67,7 @@
         var account = $('.username').val();
         var pwd = $('.password').val()
         $.ajax({
-            url:'{% url "login" %}',
+            url:'{% url "sales:login" %}',
             type:'post',
             data:{username:account,pwd:pwd,csrfmiddlewaretoken:'{{ csrf_token }}'},
             success:function (res) {    //{'status':1,'home':'/home/','msg':'用户名或密码错误'}

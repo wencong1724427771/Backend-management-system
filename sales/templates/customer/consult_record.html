@@ -2,19 +2,14 @@
 
 {% block title %}
     <h1>
-        {% if tag == 1 %}
-            公户信息展示
-        {% elif tag == 0 %}
-            我的客户信息
-        {% endif %}
-        <small>Optional description</small>
+        跟进记录展示页面
     </h1>
 {% endblock %}
 
 {% block content %}
     <!--信息表-->
     <div class="container-fluid">
-        <a href="{% url 'sales:addcustomer' %}" class="btn btn-primary">添加客户信息</a>
+        <a href="{% url 'sales:addcustomer' %}" class="btn btn-primary">添加跟进记录</a>
 
         <!-- 搜索功能 -->
         <form class="form-inline pull-right" action="#" method="get">
@@ -38,8 +33,6 @@
                 <select name="action" class="form-control">
                     <!-- 使用自定义标签 -->
                     <option value="blank">————————</option>
-                    {% load mytag %}
-                    {% show_info request %}   <!-- 传入参数request -->
                     <option value="bulk_delete">批量删除</option>
 
                 </select>
@@ -90,8 +83,8 @@
 
 {% block js %}
     <script>
-        // 保持搜索条件
-        var a = '{{ search_field }}';    // search_field=liye
+
+        var a = '{{ search_field }}';
         $('#search_field').val(a);
 
 
@@ -110,7 +103,6 @@
                 $checkAll.prop('checked',false);
             }
         })
-
 
 
     </script>

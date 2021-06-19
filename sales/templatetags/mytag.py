@@ -7,7 +7,7 @@ register = template.Library()
 # 自定义标签，实现不同页面显示不同选项
 @register.simple_tag   #---------******----------
 def show_info(request):
-    if request.path == reverse('customers'):
+    if request.path == reverse('sales:customers'):
         return mark_safe('<option value="convert_gs">公户转私户</option>')
     else:
         return mark_safe('<option value="convert_sg">私户转公户</option>')

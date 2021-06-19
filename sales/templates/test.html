@@ -3,19 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+
 </head>
 <body>
+        <div>
+            <input type="checkbox" id="checkAll">
+        </div>
 
-<form action="" method="get">
-    <b>请选择你喜欢的水果</b>
-    <div class="form-group">
-        <input name="apple" type="checkbox" value="1"> 苹果
-        <input name="apple" type="checkbox" value="2"> 橘子
-    </div>
+        <table id="inputTable">
+            <tr>
+                <td></td>
+                <td>姓名</td>
+                <td>年龄</td>
+            </tr>
+            <tr>
+                <td><input type="checkbox"></td>
+                <td>alex</td>
+                <td>33</td>
+            </tr>
+            <tr>
+                <td><input type="checkbox"></td>
+                <td>alex</td>
+                <td>33</td>
+            </tr>
+        </table>
+        <script src='../../static/login/js/jquery.js' charset="UTF-8"></script>
+        <script>
+            var $checkAll= $('#checkAll');
+            $checkAll.click(function () {
+                $('#inputTable :checkbox').prop('checked',$(this).prop('checked'));
+            });
 
 
-    <button type="submit">提交</button>
-</form>
-
+            {#$('#inputTable').on('click',':checkbox',function () {#}
+            $('#inputTable :checkbox').click(function () {
+                if($('#inputTable :checkbox').length === $('#inputTable :checked').length){
+                    $checkAll.prop('checked',true);
+                }else {
+                    $checkAll.prop('checked',false);
+                }
+            })
+        </script>
 </body>
 </html>

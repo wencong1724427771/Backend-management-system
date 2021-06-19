@@ -7,7 +7,7 @@ class Auth(MiddlewareMixin):
     # 请求来了自动执行process_request方法
     # 白名单  通过访问路径来放行
     # white_list = ['/login/', ]
-    white_list = [reverse('login'),reverse('register')]
+    white_list = [reverse('sales:login'),reverse('sales:register')]
     def process_request(self,request):
 
         path = request.path
@@ -16,5 +16,5 @@ class Auth(MiddlewareMixin):
             status = request.session.get('account')
 
             if not status:
-                return redirect('/login/')
+                return redirect('sales:login')
         # return None  # 默认

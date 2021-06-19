@@ -12,3 +12,8 @@ admin.site.register(models.Department)
 admin.site.register(models.ClassList)
 admin.site.register(models.Campuses)
 admin.site.register(models.Customer)
+
+admin.site.register(models.ConsultRecord)
+admin.site.register(models.Enrollment)    # 报名表
+admin.site.register(models.CourseRecord)
+admin.site.register(models.StudyRecord)
