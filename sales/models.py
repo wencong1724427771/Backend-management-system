@@ -249,7 +249,6 @@ class CourseRecord(models.Model):
     homework_title = models.CharField('本节作业标题', max_length=64, blank=True, null=True)
     homework_memo = models.TextField('作业描述', max_length=500, blank=True, null=True)
     scoring_point = models.TextField('得分点', max_length=300, blank=True, null=True)
-
     re_class = models.ForeignKey('ClassList', verbose_name="班级",on_delete=models.CASCADE)
     teacher = models.ForeignKey('UserInfo', verbose_name="讲师",on_delete=models.CASCADE)
 
@@ -257,7 +256,7 @@ class CourseRecord(models.Model):
         unique_together = ('re_class', 'day_num')
     def __str__(self):
 
-        return str(self.day_num)
+        return str(self.course_title)
 
 
 

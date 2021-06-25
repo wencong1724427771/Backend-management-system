@@ -1,0 +1,108 @@
+{% extends 'starter.html' %}
+
+{% block title %}
+    <h1>
+        报名信息
+        <small>Optional description</small>
+    </h1>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container-fluid">
+    {% load mytag %}
+{#        <a href="{% url 'sales:addenrollment' %}" class="btn btn-primary">添加报名信息</a>#}
+        <a href="{% reverse_url_add 'sales:addenrollment' request %}" class="btn btn-primary">添加报名信息</a>
+            <!-- 搜索功能 -->
+            <form class="form-inline pull-right" action="#" method="get">
+              <div class="form-group">
+                  <select name="search_field" id="search_field" class="form-control">
+                      <option value="stu_name" >客户信息</option>
+                      <option value="stu_class" >所报班级</option>
+                  </select>
+              </div>
+              <div class="form-group">
+                <input type="text" class="form-control" name="keyword" placeholder="请输入" value="{{ keyword|default:''}}">
+              </div>
+              <button type="submit" class="btn btn-success">搜索</button>
+            </form>
+        <hr>
+        <!-- 删除功能 -->
+        <form class="form-inline" action="" method="post">
+            {% csrf_token %}
+              <div class="form-group">
+                  <select name="action" class="form-control">
+                      <option value="blank">————————</option>
+                      <option value="bulk_delete">批量删除</option>
+                  </select>
+                  <button type="submit" class="btn btn-warning">go</button>
+              </div>
+
+            <!-- 页面信息展示 -->
+            <table class="table table-hover table-striped table-bordered">
+                <thead>
+                <tr>
+                <th><input type="checkbox" id="checkAll"></th>
+                <th>序号></th>
+                <th>客户名称</th>
+                <th>报名日期</th>
+                <th>学校</th>
+                <th>所报班级</th>
+                <th>操作</th>
+
+            </tr>
+                </thead>
+                <tbody id="inputTbody">
+                {% for enrollment in enrollments_obj %}
+                    <tr>
+                    <td><input type="checkbox" name="cids"  value="{{ enrollment.pk }}"></td>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ enrollment.customer.name }}</td>
+                    <td>{{ enrollment.enrolled_date|date:'Y-m-d' }}</td>
+                    <td>{{ enrollment.school.name }}</td>
+                    <td>{{ enrollment.enrolment_class.course }}</td>
+                    <td>
+
+{#                        {% reverse_url 'sales:editenrollment' enrollment.pk request %}#}
+                        <a href="{% url 'sales:editenrollment' enrollment.pk %}"><i class="fa fa-edit fa-2x"></i></a>
+
+                    </td>
+                </tr>
+
+                {% endfor %}
+                </tbody>
+            </table>
+        </form>
+
+        {{ page_html }}
+
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        // 保持搜索条件
+
+       var a = '{{ search_field }}';
+       console.log(a)
+        if (a !== 'None') {
+            $('#search_field').val(a);
+        }
+
+
+        // 全选、反选
+        var $checkAll= $('#checkAll');
+        $checkAll.click(function () {
+            $('#inputTbody :checkbox').prop('checked',$(this).prop('checked'));
+        });
+
+        $('#inputTbody :checkbox').click(function () {
+            if($('#inputTbody :checkbox').length === $('#inputTbody :checked').length){
+                $checkAll.prop('checked',true);
+            }else {
+                $checkAll.prop('checked',false);
+            }
+        })
+
+    </script>
+{% endblock %}

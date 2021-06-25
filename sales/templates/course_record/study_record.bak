@@ -1,0 +1,83 @@
+{% extends 'starter.html' %}
+
+{% block title %}
+
+    <h1>学习记录展示</h1>
+{% endblock %}
+
+{% block content %}
+    <!--信息表-->
+    <div class="container-fluid">
+{#    {% load mytag %}#}
+{#        <a href="{% reverse_url_add 'sales:addcourse_record' request %}" class="btn btn-primary">添加课程记录</a>#}
+
+        <!-- 搜索功能 -->
+        <form class="form-inline pull-right" action="#" method="get">
+            <div class="form-group">
+                <select name="search_field" id="search_field" class="form-control">
+                    <option value="course_title" selected>课程</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control" placeholder="请输入" name="keyword" value="{{ keyword|default:'' }}">
+            </div>
+            <button type="submit" class="btn btn-success">搜索</button>
+            <hr>
+        </form>
+
+
+
+        <form class="form-inline " action="#" method="post">
+        {% csrf_token %}
+
+{#            <div class="form-group">#}
+{#                <select name="action" class="form-control">#}
+{#                    <!-- 使用自定义标签 -->#}
+{#                    <option value="blank">————————</option>#}
+{#                    <option value="bulk_delete">批量删除</option>#}
+{#                    <option value="bulk_create_studyrecords">批量生成学习记录</option>#}
+{##}
+{#                </select>#}
+{#                <button type="submit" class="btn btn-warning">go</button>#}
+{#            </div>#}
+            <table class="table table-hover table-striped table-bordered">
+            <thead>
+            <tr>
+
+                <th><input type="checkbox" id="checkAll"></th>
+                <th>序号></th>
+                <th>考勤</th>
+                <th>本节成绩</th>
+                <th>作业批语</th>
+                <th>某节课程</th>
+                <th>学员</th>
+
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody id="inputTbody">
+            {% for study_record in all_study_records %}
+                <tr>
+                    <td><input type="checkbox" name="cids"  value="{{ record.pk }}"></td>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ study_record.get_attendance_display }}</td>
+                    <td>{{ study_record.score  }}</td>
+                    <td>{{ study_record.homework_note }}</td>
+                    <td>{{ study_record.course_record }}</td>
+                    <td>{{ study_record.student.name }}</td>
+                    <td>
+
+                        <a href=""><i class="fa fa-edit fa-2x"></i></a>
+{#                        <a href="{% reverse_url 'sales:editconsult_record' record.pk request %}"><i class="fa fa-edit fa-2x"></i></a>#}
+
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        </form>
+
+        {{ page_html }}
+
+    </div>
+{% endblock %}

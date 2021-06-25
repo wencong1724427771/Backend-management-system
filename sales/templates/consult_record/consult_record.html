@@ -2,12 +2,7 @@
 
 {% block title %}
     <h1>
-        {% if tag == 1 %}
-            公户信息展示
-        {% elif tag == 0 %}
-            我的客户信息
-        {% endif %}
-        <small>Optional description</small>
+        跟进记录展示页面
     </h1>
 {% endblock %}
 
@@ -15,15 +10,13 @@
     <!--信息表-->
     <div class="container-fluid">
     {% load mytag %}
-        <a href="{% reverse_url_add 'sales:addcustomer' request %}" class="btn btn-primary">添加客户信息</a>
-{#        <a href="{% url 'sales:addcustomer' %}" class="btn btn-primary"></a>#}
+        <a href="{% reverse_url_add 'sales:addconsult_record' request %}" class="btn btn-primary">添加跟进记录</a>
 
         <!-- 搜索功能 -->
-        <form class="form-inline pull-right" action="" method="get">
+        <form class="form-inline pull-right" action="#" method="get">
             <div class="form-group">
                 <select name="search_field" id="search_field" class="form-control">
-                    <option value="qq">qq</option>
-                    <option value="name" selected>姓名</option>
+                    <option value="customer__name__contains" selected>客户姓名</option>
                 </select>
             </div>
             <div class="form-group">
@@ -40,8 +33,6 @@
                 <select name="action" class="form-control">
                     <!-- 使用自定义标签 -->
                     <option value="blank">————————</option>
-
-                    {% show_info request %}   <!-- 传入参数request -->
                     <option value="bulk_delete">批量删除</option>
 
                 </select>
@@ -53,40 +44,28 @@
 
                 <th><input type="checkbox" id="checkAll"></th>
                 <th>序号></th>
-                <th>QQ号</th>
-                <th>姓名</th>
-                <th>性别</th>
-                <th>咨询课程</th>
-                <th>状态</th>
-                <th>销售</th>
+                <th>所咨询客户</th>
+                <th>跟进内容</th>
+                <th>跟进状态</th>
+                <th>跟进人</th>
+                <th>跟进日期</th>
 
-                {% if tag == 0 %}  <!-- 只在我的私户 /mycustomers/ 页面显示-->
-                <th>跟进记录</th>
-
-                {% endif %}
                 <th>操作</th>
             </tr>
             </thead>
             <tbody id="inputTbody">
-            {% for customer in all_customer %}
+            {% for record in all_records %}
                 <tr>
-                    <td><input type="checkbox" name="cids"  value="{{ customer.pk }}"></td>
+                    <td><input type="checkbox" name="cids"  value="{{ record.pk }}"></td>
                     <td>{{ forloop.counter }}</td>
-                    <td>{{ customer.qq }}</td>
-                    <td>{{ customer.name }}</td>
-                    <td>{{ customer.get_sex_display }}</td>  <!--对于配置了choices参数的字段，django提供了get_xxx_display方法 -女-->
-                    <td>{{ customer.course }}</td>
-                    <td>{{ customer.status }}</td>
-                    <td>{{ customer.consultant|default:'暂无' }}</td>
-                    {% if tag == 0 %}
-
+                    <td>{{ record.customer.name }}</td>
+                    <td>{{ record.note  }}</td>
+                    <td>{{ record.get_status_display }}</td>  <!--对于配置了choices参数的字段，django提供了get_xxx_display方法 -女-->
+                    <td>{{ record.consultant.username }}</td>
+                    <td>{{ record.date|date:'Y-m-d' }}</td>
                     <td>
-                        <a href="{% url 'sales:consultrecords' %}?customer_id={{ customer.pk }}">跟进记录</a>
-                    </td>
-                    {% endif %}
 
-                    <td>
-                        <a href="{% reverse_url 'sales:editcustomer' customer.pk request %}"><i class="fa fa-edit fa-2x"></i></a>
+                        <a href="{% reverse_url 'sales:editconsult_record' record.pk request %}"><i class="fa fa-edit fa-2x"></i></a>
 
                     </td>
                 </tr>
@@ -102,14 +81,11 @@
 
 {% block js %}
     <script>
-        // 保持搜索条件
-       var a = '{{ search_field }}';
-       console.log(a)
+
+        var a = '{{ search_field }}';
         if (a !== 'None') {
             $('#search_field').val(a);
-        }
-
-
+        }    38:35
 
 
         // 全选、反选
@@ -125,7 +101,6 @@
                 $checkAll.prop('checked',false);
             }
         })
-
 
 
     </script>

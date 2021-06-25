@@ -25,6 +25,7 @@ def reverse_url(url_name,pk,request):
     from django.http.request import QueryDict
     # /customers/?search_field=qq&keyword=123&page=3
     next_path = request.get_full_path()
+    # print(next_path,'xxxxxx')
     query_dict_obj = QueryDict(mutable=QueryDict)
     query_dict_obj['next'] = next_path
     # print(query_dict_obj)  # < QueryDict: {'next': ['/customers/?search_field=qq&keyword=123']} >
@@ -39,3 +40,20 @@ def reverse_url(url_name,pk,request):
 
 # print(type(request.GET))    # <class 'django.http.request.QueryDict'>   request.GET.urlencode()
 # # http://127.0.0.1:8000/editcustomer/208/?next=/customers/?search_field=qq&keyword=123&page=3
+
+@register.simple_tag
+def reverse_url_add(url_name,request):
+    from django.http.request import QueryDict
+    # /sales/consultrecords/
+    next_path = request.get_full_path()
+    query_dict_obj = QueryDict(mutable=QueryDict)
+    query_dict_obj['next'] = next_path
+    # print(query_dict_obj)  # < QueryDict: {'next': ['/sales/consultrecords/']} >
+    encode_url = query_dict_obj.urlencode()  # next=%2Fcustomers%2F%3Fsearch_field%3Dqq%26keyword%3D123%26page%3D3
+
+    per_path = reverse(url_name)  # /editconsult_record/
+    # full_path = per_path + '?next=' + next_path
+    full_path = per_path + '?' + encode_url
+    return full_path
+
+# http://127.0.0.1:8000/editconsult_record/?next=/sales/consultrecords/

@@ -1,7 +1,10 @@
 from sales import models
 from django import forms
 
+
+
 # Create your component here.
+
 class RegisterForm(forms.Form):
     username = forms.CharField(
         max_length=16,
@@ -66,6 +69,7 @@ class RegisterForm(forms.Form):
 
 
 
+
 class CustomerModelForm(forms.ModelForm):
     class Meta:
         model = models.Customer
@@ -77,7 +81,75 @@ class CustomerModelForm(forms.ModelForm):
         for field_name, field in self.fields.items():
             # print(type(field))
             from multiselectfield.forms.fields import MultiSelectFormField
+
+            #course = MultiSelectField("咨询课程", choices=course_choices)
             if not isinstance(field,MultiSelectFormField):
                 field.widget.attrs.update({'class':'form-control'})
-        #     for filed in self.fields.values():
-        #         filed.widget.attrs.update({'class': 'form-control'})
+
+
+
+
+
+
+class ConsultRecordModelForm(forms.ModelForm):
+    # customer = forms.ModelChoiceField(
+    #     queryset=models.Customer.objects.all(),   #models   foreignkey   -- customer
+    # )
+
+    # consultant = forms.ChoiceField(    # 覆盖原来的 --- 第一种方法
+    #     choices = (('1','liye'),)
+    # )
+
+    class Meta:
+        model = models.ConsultRecord
+        fields = '__all__'
+        exclude = ['delete_status']
+
+    def __init__(self,request,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+
+        for field_name, field in self.fields.items():
+            if field_name == 'customer':
+                field.queryset = models.Customer.objects.filter(consultant__username=request.session.get('account'))
+            if field_name == 'consultant':
+                # obj = models.UserInfo.objects.filter(username=request.session.get('account')).first()
+                # field.choices = ((obj.pk,obj.username),)   # 第二种方法
+
+                field.queryset= models.UserInfo.objects.filter(username=request.session.get('account'))
+
+            field.widget.attrs.update({'class':'form-control'})
+
+
+
+
+class EnrollmentModelForm(forms.ModelForm):
+
+    class Meta:
+        model = models.Enrollment
+        fields = '__all__'
+        # exclude = ['why_us','your_expectation','contract_approved','memo','delete_status']
+
+    def __init__(self,request,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+
+        for field_name, field in self.fields.items():
+            if field_name == 'customer':
+                field.queryset = models.Customer.objects.filter(consultant__username=request.session.get('account'))
+            field.widget.attrs.update({'class':'form-control'})
+
+
+
+class CourseRecordModelForm(forms.ModelForm):
+
+    class Meta:
+        model = models.CourseRecord
+        fields = '__all__'
+        # exclude = ['why_us','your_expectation','contract_approved','memo','delete_status']
+
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+
+        for field_name, field in self.fields.items():
+            # if field_name == 'customer':
+            #     field.queryset = models.Customer.objects.filter(consultant__username=request.session.get('account'))
+            field.widget.attrs.update({'class':'form-control'})

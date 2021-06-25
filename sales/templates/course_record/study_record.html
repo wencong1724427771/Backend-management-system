@@ -1,0 +1,77 @@
+{% extends 'starter.html' %}
+
+{% block title %}
+
+    <h1>学习记录展示</h1>
+{% endblock %}
+
+{% block content %}
+    <!--信息表-->
+    <div class="container-fluid">
+{#    {% load mytag %}#}
+{#        <a href="{% reverse_url_add 'sales:addcourse_record' request %}" class="btn btn-primary">添加课程记录</a>#}
+
+        <!-- 搜索功能 -->
+        <form class="form-inline pull-right" action="#" method="get">
+            <div class="form-group">
+                <select name="search_field" id="search_field" class="form-control">
+                    <option value="course_title" selected>课程</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control" placeholder="请输入" name="keyword" value="{{ keyword|default:'' }}">
+            </div>
+            <button type="submit" class="btn btn-success">搜索</button>
+            <hr>
+        </form>
+
+
+
+        <form class="form-inline " action="" method="post">
+        {{ formset.management_form }}   <!-- 必须添加 -->
+        {{ formset.errors }}   <!-- 展示错误信息 [] -->
+        {% csrf_token %}
+
+            <table class="table table-hover table-striped table-bordered">
+            <thead>
+            <tr>
+                <th><input type="checkbox" id="checkAll"></th>
+                <th>序号></th>
+                <th>考勤</th>
+                <th>本节成绩</th>
+                <th>作业批语</th>
+                <th>某节课程</th>
+                <th>学员</th>
+
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody id="inputTbody">
+            {% for field in formset %}
+                <tr>
+                    {{ field.id }}   <!-- 必须添加 -->
+                    <td><input type="checkbox" name="cids"  value="{{ record.pk }}"></td>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ field.attendance }}</td>
+                    <td>{{ field.score }}</td>
+                    <td>{{ field.homework_note }}</td>
+                    <td>{{ field.instance.course_record }}</td>
+                    <td class="hidden">{{ field.course_record }}</td>
+                    <td>{{ field.instance.student }}</td>
+                    <td class="hidden">{{ field.student }}</td>
+
+                    <td>
+                        <a href=""><i class="fa fa-edit fa-2x"></i></a>
+{#                        <a href="{% reverse_url 'sales:editconsult_record' record.pk request %}"><i class="fa fa-edit fa-2x"></i></a>#}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <button class="btn bg-primary pull-right">保存</button>
+        </form>
+
+        {{ page_html }}
+
+    </div>
+{% endblock %}
