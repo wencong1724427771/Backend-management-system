@@ -1,0 +1,182 @@
+import copy
+
+from django.shortcuts import render,redirect,reverse,HttpResponse
+from django.http import JsonResponse
+from django.conf import settings
+from django.db.models import Q
+from django.views import View
+
+from sales import models
+from utils import md5_func
+from utils.page_func import Paging
+from sales.myForms import RegisterForm,CustomerModelForm
+
+
+# 注销登录
+def logout(request):
+    request.session.flush()   # 清除cookie,删除session
+    return redirect('sales:login')
+
+# 登录
+def login(request):
+    res_dict = {'status':None,'home':None,'msg':None}
+    if request.method == 'GET':
+        return render(request, 'login/login.html')
+    else:
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user_objs = models.UserInfo.objects.filter(username=username,password=md5_func.mkMd5(password))
+
+        if user_objs:
+            # 保存当前用户名
+            request.session['account'] = username
+
+            res_dict['status'] = 1
+            res_dict['home'] = reverse('sales:home')  # '/sales/home/'
+            return JsonResponse(res_dict)
+        else:
+            res_dict['status'] = 0
+            res_dict['msg'] = '用户名或密码错误'
+            return JsonResponse(res_dict)
+
+# 注册
+def register(request):
+    if request.method == 'GET':
+        register_obj =RegisterForm()
+
+        context = {
+            'register_obj':register_obj
+        }
+        return render(request, 'Login/register.html',context=context)
+    if request.method == 'POST':
+        register_obj = RegisterForm(request.POST)    # <class 'django.http.request.QueryDict'>
+        if register_obj.is_valid():
+            # print(register_obj.cleaned_data['username'])
+            # {'username': '初学者', 'password': '123456', 'r_password': '123456', 'telephone': '18370029122', 'email': '1724427771@qq.com'} <class 'dict'>
+            password = register_obj.cleaned_data.pop('r_password')   # 数据清洗
+            md5_pwd = md5_func.mkMd5(password)
+            data = register_obj.cleaned_data
+            data.update({'password': md5_pwd})
+            # 保存数据
+            models.UserInfo.objects.create(
+                **data
+            )
+            return redirect('sales:login')   # 重定向
+        else:
+            context = {
+                'register_obj': register_obj
+            }
+            return render(request,'Login/register.html',context=context)
+
+
+# 首页
+def home(request):
+    return render(request,'starter.html')
+
+
+class Customers(View):
+    def get(self,request):
+        # ?search_field = qq__contains & keyword = 123
+        # ?page = 2
+        # print(request.GET)              # <QueryDict: {'search_field': ['qq__contains'], 'keyword': ['123']}>
+        # print(type(request.GET))  # <class 'django.http.request.QueryDict'>
+        # print(request.path)                    # /customers/
+        # print(request.get_full_path())         # /customers/?search_field=qq__contains&keyword=123
+        # res = request.GET.urlencode()      # search_field=qq__contains&keyword=123    <class 'str'>
+        print(type(request.get_full_path()))
+        recv_data = copy.copy(request.GET)
+
+        current_page_number = request.GET.get('page')  # 当前页码 & 开始取第几条数据的位置
+        search_field = request.GET.get('search_field')  # 搜索条件
+        keyword = request.GET.get('keyword')  # 关键字  xx__contains
+        # 先根据路径过滤数据库查询对象
+        if request.path == reverse('sales:mycustomers'):
+            tag = 1
+            all_customers = models.Customer.objects.all().filter(consultant__username=request.session.get('account'))
+        else:
+            tag = 0
+            all_customers = models.Customer.objects.all().filter(consultant__isnull=True)
+        if keyword:
+            q = Q()  # 实例化q对象
+            # q.connector = 'or' # 默认是and
+            q.children.append([search_field, keyword])  # Q(name__contains='xx')
+            # q.children.append([search_field1, keyword1])  # 可以完成多条件
+            all_customers = all_customers.filter(q)
+        else:
+            all_customers = all_customers.all()
+
+        total_count = all_customers.count()  # 总数据量
+        per_page_num = settings.PER_PAGE_COUNT  # 10
+        page_number_show = settings.PAGE_NUMBER_SHOW  # 7
+
+        page_obj = Paging(current_page_number, total_count, per_page_num, page_number_show, recv_data)
+        page_html = page_obj.page_html_func
+
+        all_customers = all_customers[page_obj.start_data_number:page_obj.end_data_number]
+
+        context = {
+            "all_customers": all_customers,
+            "page_html": page_html,
+            "search_field": search_field,
+            "keyword": keyword,  # 保存搜索条件
+            "tag": tag  # 第二种方法判断公户还是私户
+            # "page_html":mark_safe(page_html)
+        }
+        return render(request, 'customer/customers.html', context=context)
+
+    def post(self,request):
+        action = request.POST.get('action')
+        print(action,type(action))    # bulk_delete <class 'str'>
+        cids = request.POST.getlist('cids')  # 多选框取值
+        print(cids,type(cids))
+        customer_list_obj = models.Customer.objects.filter(id__in=cids)
+        if hasattr(self,action):
+            ret = getattr(self,action)(request,customer_list_obj)
+            if ret:
+                return ret
+            else:
+                return redirect(request.path)
+        else:
+            return HttpResponse('你访问的路径不存在!')
+
+    # blank '------'
+    def blank(self,request,*args,**kwargs):
+        return redirect(request.path)
+
+    # 批量删除
+    def bulk_delete(self,request,customer_list_obj):
+        customer_list_obj.delete()
+        return redirect(request.path)
+
+    # 公转私
+    def reverse_gs(self,request,customer_list_obj):
+        user_obj = models.UserInfo.objects.get(username=request.session.get('account'))
+        customer_list_obj.update(consultant_id=user_obj.id)
+
+    # 私转公
+    def reverse_sg(self, request, customer_list_obj):
+        customer_list_obj.update(consultant_id=None)
+
+
+def addEditCustomer(request,n=None):
+    old_obj = models.Customer.objects.filter(pk=n).first()
+    label  = '编辑页面' if n else '添加页面'
+
+    if request.method == 'GET':
+        model_form_obj = CustomerModelForm(instance=old_obj)
+        return render(request, 'customer/editcustomer.html', {'form_obj': model_form_obj,'label':label})
+    else:
+        # a = request.GET['next']
+        # print(a,type(a),'xxx')     # /customers/?page=2 <class 'str'> xxx   # 会自动解析encode编码
+        next_path = request.GET.get('next')
+        # print(next_path,'000')     # /customers/?search_field=name__contains&keyword=xm2&page=2  000
+
+
+        model_form_obj = CustomerModelForm(request.POST,instance=old_obj)
+        if model_form_obj.is_valid():
+            model_form_obj.save()
+            # return redirect('customers')
+            return redirect(next_path)
+        else:
+            return render(request, 'customer/editcustomer.html', {'form_obj': model_form_obj,'label':label})
+

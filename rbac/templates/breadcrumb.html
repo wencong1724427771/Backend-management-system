@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <ol class="breadcrumb">        <!-- 用到其他系统里面可能会没有css样式,不过可以找这种模式修改自己的面包屑 -->
+          <li><a href="#"><i class="fa fa-dashboard"></i> Level</a></li>
+{#        {% for foo in request.bread_crumb %}#}
+        {% for foo in bread_crumb %}
+          {% if forloop.last %}
+                <li class="active">{{ foo.title }}</li>    <!-- 最后一次不给点击 -->
+              {% else %}
+                <li><a href="{{ foo.url }}">{{ foo.title }}</a></li>
+          {% endif %}
+        {% endfor %}
+    </ol>
+</body>
+</html>

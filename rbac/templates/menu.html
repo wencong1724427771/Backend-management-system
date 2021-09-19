@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    {% block css %}
+        <style>
+        .show{
+            display: block;
+        }
+        </style>
+    {% endblock %}
+</head>
+<body>
+{#        {% load mytag %} <!--引入add_prefix过滤器-->#}
+
+        {% for k,v in menu_dict.items  %}
+{#            <li class="{{m.class}}"><a href="{{ m.permissions__url|add_prefix }}">#}
+{#               <i class="{{ m.permissions__icon }}"></i><span>{{ m.permissions__title }}</span></a></li>#}
+         <li class="treeview {{ v.class1 }}">
+
+          <a href="javascript:void(0)"><i class="{{ v.icon }}"></i> <span>{{ v.name }}</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+          </a>
+          <ul class="treeview-menu {{ v.class }}">
+              {% for child in v.children %}
+                    <li class="{{ child.class }}"><a href="{{ child.url }}">{{ child.title }}</a></li>
+              {% endfor %}
+          </ul>
+        </li>
+
+        {% endfor %}
+
+</body>
+
+</html>
